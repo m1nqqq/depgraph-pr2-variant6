@@ -11,3 +11,7 @@ class ConfigError(DepGraphError):
 
 class RepositoryError(DepGraphError):
     """Ошибка получения или разбора данных репозитория."""
+
+
+class RenderError(DepGraphError):
+    """Ошибка при создании изображения графа."""

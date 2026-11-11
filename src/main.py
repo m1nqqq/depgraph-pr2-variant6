@@ -6,6 +6,7 @@ import sys
 from src.config import load_config
 from src.errors import DepGraphError
 from src.graph import build_graph, format_graph
+from src.render import d2_path_for, save_image
 from src.reverse import find_dependents, format_dependents
 from src.sources import open_repository
 
@@ -57,6 +58,9 @@ def run_graph(config, repo):
     for line in format_graph(graph):
         print(f"  {line}")
     print_cycles(graph.cycles)
+    renderer = save_image(graph, config.output_file)
+    print(f"D2-описание: {d2_path_for(config.output_file)}")
+    print(f"Изображение (SVG, {renderer}): {config.output_file}")
 
 
 def run(args):

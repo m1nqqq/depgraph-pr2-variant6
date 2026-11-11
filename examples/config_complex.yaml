@@ -2,4 +2,4 @@ package: A
 repository: examples/repo_complex.txt
 test_mode: true
 version: 1.0.0
-output_file: graph.svg
+output_file: examples/images/complex.svg

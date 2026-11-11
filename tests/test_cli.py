@@ -5,6 +5,7 @@ import io
 import os
 import tempfile
 import unittest
+from unittest import mock
 
 from src.main import EXIT_ERROR, EXIT_OK, main
 from tests.apk_fixture import write_repository
@@ -14,7 +15,8 @@ def run_cli(*argv):
     """Запускает main, возвращает (код, stdout, stderr)."""
     out, err = io.StringIO(), io.StringIO()
     with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
-        code = main(list(argv))
+        with mock.patch("src.render.shutil.which", return_value=None):
+            code = main(list(argv))
     return code, out.getvalue(), err.getvalue()
 
 
@@ -43,7 +45,7 @@ class CliTest(unittest.TestCase):
             code, out, _ = run_cli(self.make_config(folder))
         self.assertEqual(code, EXIT_OK)
         self.assertEqual(
-            out.splitlines()[1:],
+            out.splitlines()[1:5],
             [
                 "  app -> lib, musl, tool",
                 "  lib -> musl",
@@ -51,6 +53,22 @@ class CliTest(unittest.TestCase):
                 "  tool (нет зависимостей)",
             ],
         )
+
+    def test_creates_d2_and_svg(self):
+        """Создаются D2-описание и SVG."""
+        with tempfile.TemporaryDirectory() as folder:
+            code, out, _ = run_cli(self.make_config(folder))
+            self.assertEqual(code, EXIT_OK)
+            self.assertTrue(os.path.isfile(os.path.join(folder, "graph.svg")))
+            self.assertTrue(os.path.isfile(os.path.join(folder, "graph.d2")))
+        self.assertIn("Изображение (SVG, встроенный):", out)
+
+    def test_reverse_mode_makes_no_image(self):
+        """В режиме --reverse изображение не создаётся."""
+        with tempfile.TemporaryDirectory() as folder:
+            path = self.make_config(folder, package="musl", version="1.2-r0")
+            run_cli(path, "--reverse")
+            self.assertFalse(os.path.exists(os.path.join(folder, "graph.svg")))
 
     def test_no_dependencies(self):
         """Пакет без зависимостей."""
