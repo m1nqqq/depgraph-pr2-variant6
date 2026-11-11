@@ -3,9 +3,10 @@
 import argparse
 import sys
 
-from src.apk_index import load_index
 from src.config import load_config
 from src.errors import DepGraphError
+from src.graph import build_graph, format_cycles, format_graph
+from src.sources import open_repository
 
 DEFAULT_CONFIG = "config.yaml"
 EXIT_OK = 0
@@ -28,17 +29,17 @@ def build_parser():
 
 
 def run(args):
-    """Выполняет работу этапа 2: выводит прямые зависимости пакета."""
+    """Выполняет работу этапа 3: строит и выводит граф зависимостей."""
     config = load_config(args.config)
-    if config.test_mode:
-        raise DepGraphError("тестовый режим поддерживается с этапа 3")
-    index = load_index(config.repository)
-    names = index.direct_dependencies(config.package, config.version)
-    print(f"Прямые зависимости {config.package} {config.version}:")
-    for name in names:
-        print(f"  {name}")
-    if not names:
-        print("  (нет зависимостей)")
+    repo = open_repository(config)
+    graph = build_graph(repo, config.package)
+    print(f"Граф зависимостей пакета {config.package}:")
+    for line in format_graph(graph):
+        print(f"  {line}")
+    if graph.cycles:
+        print("Циклические зависимости:")
+        for line in format_cycles(graph):
+            print(line)
 
 
 def main(argv=None):
