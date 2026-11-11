@@ -5,7 +5,8 @@ import sys
 
 from src.config import load_config
 from src.errors import DepGraphError
-from src.graph import build_graph, format_cycles, format_graph
+from src.graph import build_graph, format_graph
+from src.reverse import find_dependents, format_dependents
 from src.sources import open_repository
 
 DEFAULT_CONFIG = "config.yaml"
@@ -25,21 +26,47 @@ def build_parser():
         default=DEFAULT_CONFIG,
         help=f"путь к YAML-конфигурации (по умолчанию {DEFAULT_CONFIG})",
     )
+    parser.add_argument(
+        "--reverse",
+        action="store_true",
+        help="вывести обратные зависимости пакета (кто от него зависит)",
+    )
     return parser
 
 
-def run(args):
-    """Выполняет работу этапа 3: строит и выводит граф зависимостей."""
-    config = load_config(args.config)
-    repo = open_repository(config)
+def print_cycles(cycles):
+    """Печатает найденные циклические зависимости, если они есть."""
+    if cycles:
+        print("Циклические зависимости:")
+        for cycle in cycles:
+            print("  " + " -> ".join(cycle))
+
+
+def run_reverse(config, repo):
+    """Режим обратных зависимостей (этап 4)."""
+    result = find_dependents(repo, config.package)
+    for line in format_dependents(result):
+        print(line)
+    print_cycles(result.cycles)
+
+
+def run_graph(config, repo):
+    """Основной режим: строит и выводит граф зависимостей."""
     graph = build_graph(repo, config.package)
     print(f"Граф зависимостей пакета {config.package}:")
     for line in format_graph(graph):
         print(f"  {line}")
-    if graph.cycles:
-        print("Циклические зависимости:")
-        for line in format_cycles(graph):
-            print(line)
+    print_cycles(graph.cycles)
+
+
+def run(args):
+    """Загружает конфигурацию и выполняет выбранный режим."""
+    config = load_config(args.config)
+    repo = open_repository(config)
+    if args.reverse:
+        run_reverse(config, repo)
+    else:
+        run_graph(config, repo)
 
 
 def main(argv=None):

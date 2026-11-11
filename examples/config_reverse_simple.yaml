@@ -1,0 +1,5 @@
+package: D
+repository: examples/repo_simple.txt
+test_mode: true
+version: 1.0.0
+output_file: graph.svg

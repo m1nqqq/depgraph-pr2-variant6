@@ -14,6 +14,13 @@ class DictRepository:
         """Прямые зависимости пакета (у неописанного пакета их нет)."""
         return list(self.edges.get(name, ()))
 
+    def names(self):
+        """Имена всех пакетов, описанных или упомянутых в репозитории."""
+        names = dict.fromkeys(self.edges)
+        for dependencies in self.edges.values():
+            names.update(dict.fromkeys(dependencies))
+        return list(names)
+
     def require(self, name):
         """Проверяет, что пакет описан в репозитории."""
         if name not in self.edges:
@@ -39,6 +46,10 @@ class ApkRepository:
                 return []
             version = records[0].version
         return self.index.direct_dependencies(name, version)
+
+    def names(self):
+        """Имена всех пакетов индекса."""
+        return list(self.index.by_name)
 
     def require(self, name):
         """Проверяет, что пакет (заданной версии) есть в индексе."""

@@ -100,6 +100,32 @@ class CliTest(unittest.TestCase):
         self.assertEqual(code, EXIT_ERROR)
         self.assertIn("строка 1", err)
 
+    def test_reverse_mode_apk(self):
+        """Режим --reverse для репозитория apk."""
+        with tempfile.TemporaryDirectory() as folder:
+            path = self.make_config(
+                folder, package="musl", version="1.2-r0"
+            )
+            code, out, _ = run_cli(path, "--reverse")
+        self.assertEqual(code, EXIT_OK)
+        self.assertEqual(
+            out.splitlines()[2:5],
+            ["  app", "  lib", "Все, включая транзитивные:"],
+        )
+
+    def test_reverse_mode_test_repository(self):
+        """Режим --reverse в тестовом режиме."""
+        with tempfile.TemporaryDirectory() as folder:
+            repo = os.path.join(folder, "repo.txt")
+            with open(repo, "w", encoding="utf-8") as file:
+                file.write("A: B\nB: C\nC:\n")
+            path = self.make_config(
+                folder, package="C", repository=repo, test_mode="true"
+            )
+            code, out, _ = run_cli(path, "--reverse")
+        self.assertEqual(code, EXIT_OK)
+        self.assertIn("Прямые (зависят от пакета напрямую):\n  B\n", out)
+
     def test_wrong_version(self):
         """Неверная версия даёт код ошибки и подсказку."""
         with tempfile.TemporaryDirectory() as folder:
