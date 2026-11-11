@@ -3,6 +3,7 @@
 import argparse
 import sys
 
+from src.apk_index import load_index
 from src.config import load_config
 from src.errors import DepGraphError
 
@@ -27,10 +28,17 @@ def build_parser():
 
 
 def run(args):
-    """Выполняет работу этапа 1: выводит параметры конфигурации."""
+    """Выполняет работу этапа 2: выводит прямые зависимости пакета."""
     config = load_config(args.config)
-    for key, value in config.as_pairs():
-        print(f"{key}: {value}")
+    if config.test_mode:
+        raise DepGraphError("тестовый режим поддерживается с этапа 3")
+    index = load_index(config.repository)
+    names = index.direct_dependencies(config.package, config.version)
+    print(f"Прямые зависимости {config.package} {config.version}:")
+    for name in names:
+        print(f"  {name}")
+    if not names:
+        print("  (нет зависимостей)")
 
 
 def main(argv=None):

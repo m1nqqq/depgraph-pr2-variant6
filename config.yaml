@@ -1,10 +1,10 @@
 # Имя анализируемого пакета
-package: A
+package: nginx
 # URL репозитория (обычный режим) или путь к файлу (тестовый режим)
-repository: examples/repo_simple.txt
+repository: https://dl-cdn.alpinelinux.org/alpine/v3.20/main/x86_64
 # true - читать граф из тестового файла, false - из репозитория apk
-test_mode: true
-# Версия пакета (в тестовом режиме не используется при поиске)
-version: 1.0.0
+test_mode: false
+# Точная версия пакета из репозитория (при ошибке будут показаны доступные)
+version: 1.26.2-r0
 # Имя файла с изображением графа
 output_file: graph.svg

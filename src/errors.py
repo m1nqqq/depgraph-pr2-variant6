@@ -7,3 +7,7 @@ class DepGraphError(Exception):
 
 class ConfigError(DepGraphError):
     """Ошибка в конфигурационном файле."""
+
+
+class RepositoryError(DepGraphError):
+    """Ошибка получения или разбора данных репозитория."""
