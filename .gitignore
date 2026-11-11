@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.venv/
+.idea/
+.vscode/
+*.egg-info/
+build/
+dist/
+/graph.svg
+/graph.d2
