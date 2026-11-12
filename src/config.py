@@ -14,8 +14,8 @@ REQUIRED_KEYS = (
     "output_file",
 )
 QUOTES = "\"'"
-KEY_VALUE_RE = re.compile(r"^([A-Za-z_][A-Za-z0-9_-]*):(?:\s+(.*))?$")
-QUOTED_RE = re.compile(r"^([\"'])(.*)\1$")
+KEY_VALUE_RE = re.compile(r"^([A-Za-z_][A-Za-z0-9_-]*):(?:\\s+(.*))?$")
+QUOTED_RE = re.compile(r"^([\"'])(.*)\\1$")
 PACKAGE_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._+-]*$")
 TEST_PACKAGE_RE = re.compile(r"^[A-Z]+$")
 VERSION_RE = re.compile(r"^[0-9][0-9A-Za-z._+~-]*$")
@@ -93,6 +93,8 @@ def parse_yaml(text):
 
 def _read_text(path):
     """Читает конфигурационный файл, преобразуя ошибки ввода-вывода."""
+    if os.path.isdir(path):
+        raise ConfigError(f"'{path}' является папкой, нужен файл")
     try:
         with open(path, encoding="utf-8-sig") as file:
             return file.read()
