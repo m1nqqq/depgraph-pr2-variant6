@@ -21,7 +21,7 @@ def reverse_repository(repo):
     reversed_edges = {name: [] for name in repo.names()}
     for name in repo.names():
         for dependency in repo.dependencies(name):
-            reversed_edges[dependency].append(name)
+            reversed_edges.setdefault(dependency, []).append(name)
     return DictRepository(reversed_edges)
 
 
