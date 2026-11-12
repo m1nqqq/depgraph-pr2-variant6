@@ -1,7 +1,7 @@
 """Тесты встроенной отрисовки SVG."""
 
 import unittest
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as element_tree
 
 from src.file_repo import parse_test_repository
 from src.graph import build_graph
@@ -14,7 +14,7 @@ NAMESPACE = "{http://www.w3.org/2000/svg}"
 def svg_of(text, root="A"):
     """Разбирает SVG, построенный для тестового репозитория."""
     graph = build_graph(parse_test_repository(text), root)
-    return ET.fromstring(render_svg(graph))
+    return element_tree.fromstring(render_svg(graph))
 
 
 def edge_paths(tree):
@@ -58,7 +58,7 @@ class RenderSvgTest(unittest.TestCase):
     def test_names_are_escaped(self):
         """Спецсимволы в именах не ломают XML."""
         graph = build_graph(DictRepository({"a&b": ["<c>"]}), "a&b")
-        tree = ET.fromstring(render_svg(graph))
+        tree = element_tree.fromstring(render_svg(graph))
         texts = [item.text for item in tree.iter(f"{NAMESPACE}text")]
         self.assertEqual(sorted(texts), ["<c>", "a&b"])
 
