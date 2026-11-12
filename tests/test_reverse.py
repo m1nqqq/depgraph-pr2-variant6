@@ -32,6 +32,13 @@ class ReverseRepositoryTest(unittest.TestCase):
         repo = parse_test_repository("A: Z\n")
         self.assertEqual(repo.names(), ["A", "Z"])
 
+    def test_unresolved_dependencies_are_safe(self):
+        """Неразрешённые зависимости не вызывают KeyError."""
+        repo = parse_test_repository("A: MISSING\nB: A\n")
+        reversed_repo = reverse_repository(repo)
+        self.assertEqual(reversed_repo.dependencies("A"), ["B"])
+        self.assertEqual(reversed_repo.dependencies("MISSING"), ["A"])
+
 
 class FindDependentsTest(unittest.TestCase):
     """Тесты поиска зависящих пакетов."""
