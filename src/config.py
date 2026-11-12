@@ -14,7 +14,7 @@ REQUIRED_KEYS = (
     "output_file",
 )
 QUOTES = "\"'"
-KEY_VALUE_RE = re.compile(r"^([A-Za-z_][A-Za-z0-9_-]*):(?:\\s+(.*))?$")
+KEY_VALUE_RE = re.compile(r"^([A-Za-z_][A-Za-z0-9_-]*):(?:\s+(.*))?$")
 QUOTED_RE = re.compile(r"^([\"'])(.*)\1$")
 PACKAGE_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._+-]*$")
 TEST_PACKAGE_RE = re.compile(r"^[A-Z]+$")
